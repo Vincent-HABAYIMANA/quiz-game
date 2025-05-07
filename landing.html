@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rwanda Quiz Game</title>
+    <style>
+        /* General styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            color: rgb(6, 6, 6);
+            text-align: center;
+            animation: gradient 10s infinite;
+            background: linear-gradient(45deg, #021b3e, #457b9d, #a8dadc, #f1faee);
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Light mode styles */
+        body.light-mode {
+            background: linear-gradient(45deg, #ffffff, #eeeeee);
+            color: #333;
+        }
+
+        body.light-mode button {
+            background-color: #333;
+            color: rgb(223, 174, 15);
+        }
+
+        /* Centered container */
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: rgba(98, 132, 177, 0.5); /* Semi-transparent overlay */
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            color: #000000;
+            animation: fadeIn 2s ease-in-out;
+        }
+
+        p {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #000000;
+        }
+
+        button {
+            background-color: #39a05b;
+            border: none;
+            color: rgb(232, 220, 205);
+            padding: 15px 30px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: #06023e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Rwanda Quiz Game!</h1>
+        <p>Think you know everything about Rwanda? Test your knowledge and learn more!</p>
+        <button id="startGame">Start Game</button>
+        <button id="shareButton">Share on Social Media</button>
+        <button id="randomFactButton">Show Me Another Fact</button>
+        <button id="themeToggle">Switch to Dark Mode</button>
+        
+        <p id="highScore"></p>
+        <p id="randomFact"></p>
+    </div>
+
+    <audio id="clickSound" src="https://www.soundjay.com/button/beep-07.mp3" preload="auto"></audio>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const startButton = document.getElementById("startGame");
+            const shareButton = document.getElementById("shareButton");
+            const randomFactButton = document.getElementById("randomFactButton");
+            const themeToggle = document.getElementById("themeToggle");
+            const highScoreDisplay = document.getElementById("highScore");
+            const randomFactDisplay = document.getElementById("randomFact");
+            const clickSound = document.getElementById("clickSound");
+
+            // High Score Display
+            const highScore = localStorage.getItem("highScore") || 0;
+            highScoreDisplay.textContent = `High Score: ${highScore}`;
+
+            // Random Fact Display
+            const facts = [
+                "Rwanda is known as the 'Land of a Thousand Hills.'",
+                "Kigali, the capital, is one of the cleanest cities in Africa.",
+                "Rwanda has one of the highest rates of female representation in parliament worldwide.",
+                "The currency of Rwanda is the Rwandan Franc.",
+                "The Akagera National Park is home to the Big Five safari animals."
+            ];
+            randomFactDisplay.textContent = `Did you know? ${facts[Math.floor(Math.random() * facts.length)]}`;
+
+            // Start Game with Countdown
+            startButton.addEventListener("click", () => {
+                clickSound.play();
+                const proceed = window.confirm(
+                    "Welcome to the Rwanda Quiz Game!\n\n" +
+                    "- You will answer 5 questions about Rwanda.\n" +
+                    "- You have 60 seconds to complete the quiz.\n" +
+                    "- The quiz ends when time is up or all questions are answered.\n\n" +
+                    "Click OK to proceed or Cancel to stay on this page."
+                );
+
+                if (proceed) {
+                    let countdown = 3;
+                    const countdownMessage = document.createElement("h2");
+                    countdownMessage.style.color = "white";
+                    countdownMessage.style.fontSize = "2em";
+                    document.querySelector(".container").appendChild(countdownMessage);
+
+                    const interval = setInterval(() => {
+                        countdownMessage.textContent = `Starting in... ${countdown}`;
+                        countdown--;
+
+                        if (countdown < 0) {
+                            clearInterval(interval);
+                            window.location.href = "quiz.html"; // Adjust to your quiz page
+                        }
+                    }, 1000);
+                }
+            });
+
+            // Theme Toggle Functionality
+            themeToggle.addEventListener("click", () => {
+                document.body.classList.toggle("light-mode");
+                if (document.body.classList.contains("light-mode")) {
+                    themeToggle.textContent = "Switch to Dark Mode";
+                } else {
+                    themeToggle.textContent = "Switch to Light Mode";
+                }
+            });
+
+            // Share Button Functionality
+            shareButton.addEventListener("click", () => {
+                const url = encodeURIComponent("https://yourgameurl.com");
+                const text = encodeURIComponent("Test your Rwanda knowledge with this fun quiz!");
+                const twitterUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+
+                window.open(twitterUrl, "_blank");
+            });
+
+            // Random Fact Button
+            randomFactButton.addEventListener("click", () => {
+                const randomFact = facts[Math.floor(Math.random() * facts.length)];
+                randomFactDisplay.textContent = `Did you know? ${randomFact}`;
+            });
+        });
+    </script>
+</body>
+</html>

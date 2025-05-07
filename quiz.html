@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rwanda Info Quiz Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        #startScreen, #quizContainer, #endScreen, #certificate {
+            display: none;
+        }
+        #startScreen, #endScreen {
+            margin-top: 50px;
+        }
+        #quizContainer {
+            margin-top: 20px;
+        }
+        .option {
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+            width: 50%;
+        }
+        .correct {
+            background-color: lightgreen;
+        }
+        .incorrect {
+            background-color: lightcoral;
+        }
+        #timer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 10px 20px;
+            color: white;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        #timer:hover {
+            background-color: #0056b3;
+        }
+        #certificate {
+            display: none;
+            border: 2px solid black;
+            padding: 20px;
+            margin: 20px auto;
+            width: 50%;
+            text-align: center;
+            background-color: #f9f9f9;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #certificate {
+            display: none;
+            border: 2px solid black;
+            padding: 10px;
+            margin: 20px auto;
+            width: 50%;
+            text-align: center;
+            background-color: #f9f9f9;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative; /* For positioning the pseudo-element */
+            overflow: hidden; /* Ensure the watermark stays within bounds */
+        }
+        
+        #certificate::before {
+            content: "RWANDA QUIZ TEST"; /* Your watermark text */
+            position: absolute;
+            top: 50%;
+            background-repeat: repeat;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg); /* Center and rotate */
+            font-size: 50px; /* Adjust the font size */
+            color: rgba(0, 0, 0, 0.1); /* Light gray color for watermark */
+            white-space: nowrap;
+            z-index: 0; /* Ensure it stays in the background */
+            pointer-events: none; /* Make it non-interactive */
+        }
+        
+        
+        #certificate h1 {
+            font-size: 24px;
+            color: #282424;
+        }
+        #certificate p {
+            font-size: 18px;
+        }
+        #downloadBtn {
+            margin-top: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none; /* Hidden by default */
+        }
+        #downloadBtn:hover {
+            background-color: #218838;
+        }
+        #certificateName {
+            font-size: 24px;
+            color: #4c84fb;
+            display: inline-block;
+            margin-bottom: 10px;
+            border-bottom: 3px solid blue; /* Blue underline */
+            padding-bottom: 5px; /* Adjust spacing between text and underline */
+            font-style: italic; /* Make the text italic */
+        }
+        
+    </style>
+</head>
+<body>
+    <!-- Start Screen -->
+    <div id="startScreen">
+        <h1>Welcome to Rwanda Info Quiz Game</h1>
+        <button onclick="startQuiz()">Start Quiz</button>
+    </div>
+
+    <!-- Quiz Container -->
+    <div id="quizContainer">
+        <h2 id="question"></h2>
+        <div id="options"></div>
+        <p id="feedback"></p>
+        <p id="score">Score: 0</p>
+        <button id="timer"></button>
+    </div>
+
+    <!-- End Screen -->
+    <div id="endScreen">
+        <h2>Quiz Finished!</h2>
+        <p id="result"></p>
+        <button onclick="showCertificate()">Get Certificate</button>
+    </div>
+
+    <!-- Certificate -->
+    <div id="certificate">
+        <h1>Certificate of Achievement</h1>
+        <p>This certificate is awarded to</p>
+        <h2 id="certificateName"></h2>
+        <p>For demonstrating exceptional knowledge in the Rwanda Info Quiz Game and scoring.
+        Keep up the great work and continue exploring more about Rwanda!</p>
+        <h2 id="certificateScore"></h2>
+        <div id="partners" style="margin-top: 30px; display: flex; justify-content: space-between;">
+            <!-- Partner logos will be dynamically added here -->
+        </div>
+    </div>
+
+    <!-- Download Button --> <center>
+    <button id="downloadBtn" onclick="downloadCertificate()">Download Certificate</button>
+</center>
+    <script>
+        const questions = [
+            {
+                question: "Rwanda is part of an economic community in East Africa. What is the name of this community?",
+                options: ["East African Community (EAC).", "Economic Community of Central African States. ", "Economic Community of West African States.", "The Community of Sahel-Saharan States. "],
+                answer: "East African Community (EAC)."
+            },
+            {
+                question: "What is the major cash crop and export of Rwanda?",
+                options: ["Coffee and tea are a major cash crop and export of Rwanda.", "carrot is a major cash crop and export of Rwanda.", "Coffee is a major cash crop and export of Rwanda.", "irish potatoes is a major cash crop and export of Rwanda."],
+                answer: "Coffee and tea are a major cash crop and export of Rwanda."
+            },
+            {
+                question: " What geographical feature does this nickname highlight?",
+                options: ["cleaned country", "unity and freedom country", "peace country.", "Land of a Thousand Hills"],
+                answer: "Land of a Thousand Hills"
+            },
+            {
+                question: "In what year did Rwanda gain independence from Belgian rule?",
+                options: ["July 3, 1962.", "July 1, 1962", "JUNE 1, 1964.", "Seaweed"],
+                answer: "July 1, 1962"
+            },
+            {
+                question: " In which continent is Rwanda located??",
+                options: ["Europe", "Africa", "South America", "Asia"],
+                answer: "Africa"
+            },
+            {
+                question: "What is the capital city of Rwanda?",
+                options: ["Butare", "Gisenyi", "Kigali", "Ruhengeri"],
+                answer: "Kigali"
+            },
+            {
+                question: "Which African region is Rwanda located in?",
+                options: ["West africa", "East Africa.", "North africa", "South Africa."],
+                answer: "East Africa."
+            },
+            {
+                question: "What is the official language of Rwanda?",
+                options: ["The official languages of Rwanda are Kinyarwanda, Kiswahili,French, and English.", "The official languages of Rwanda are Kinyarwanda, Espansol, and English.", "The official languages of Rwanda are Kinyarwanda,swahili, and English.", "The official languages of Rwanda are Kinyarwanda, French, and swahili."],
+                answer: "The official languages of Rwanda are Kinyarwanda, Kiswahili,French, and English."
+            },
+            {
+                question: "Which African Great Lake is located to the west of Rwanda?",
+                options: ["south", "east", "Kigali", "west"],
+                answer: "Kigali"
+            },
+            {
+                question: "What is the greatest lake in Rwanda?",
+                options: ["lake muhazi", "lake kivu", "north cyohoha", "lake rweru"],
+                answer: "lake kivu"
+            }
+        ];
+
+        let playerName = "";
+        let currentQuestion = 0;
+        let score = 0;
+        let timeLeft = 30;
+        let timerInterval;
+
+        function startQuiz() {
+            playerName = prompt("Please enter your name to start the quiz:");
+            if (!playerName || playerName.trim() === "") {
+                alert("You must enter a valid name to start the quiz!");
+                return;
+            }
+            document.getElementById("startScreen").style.display = "none";
+            document.getElementById("quizContainer").style.display = "block";
+            displayQuestion();
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+
+        function displayQuestion() {
+            const question = questions[currentQuestion];
+            document.getElementById("question").textContent = question.question;
+            const optionsContainer = document.getElementById("options");
+            optionsContainer.innerHTML = "";
+            question.options.forEach(option => {
+                const optionElement = document.createElement("div");
+                optionElement.classList.add("option");
+                optionElement.textContent = option;
+                optionElement.addEventListener("click", checkAnswer);
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+
+        function checkAnswer(event) {
+            const selectedOption = event.target;
+            const correctAnswer = questions[currentQuestion].answer;
+            if (selectedOption.textContent === correctAnswer) {
+                score++;
+                selectedOption.classList.add("correct");
+                document.getElementById("feedback").textContent = "Correct!";
+            } else {
+                selectedOption.classList.add("incorrect");
+                document.getElementById("feedback").textContent = "Incorrect!";
+            }
+            document.getElementById("score").textContent = "Score: " + score;
+            setTimeout(nextQuestion, 1000);
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                displayQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function endQuiz() {
+            clearInterval(timerInterval);
+            document.getElementById("quizContainer").style.display = "none";
+            document.getElementById("endScreen").style.display = "block";
+            document.getElementById("result").textContent = `${playerName}, you scored ${score} out of ${questions.length}!`;
+        }
+
+        function updateTimer() {
+            timeLeft--;
+            document.getElementById("timer").textContent = `Time Left: ${timeLeft}s`;
+            if (timeLeft <= 0) {
+                endQuiz();
+            }
+        }
+
+        function showCertificate() {
+            document.getElementById("endScreen").style.display = "none";
+            document.getElementById("certificate").style.display = "block";
+            document.getElementById("certificateName").textContent = playerName;
+            document.getElementById("certificateScore").textContent = `${score} out of ${questions.length}`;
+            document.getElementById("result").textContent = `${playerName}, you scored ${score} out of ${questions.length}!`;
+            document.getElementById("result").textContent = `${playerName}, Thank you!`;
+        
+            // Feedback based on score
+            let feedbackMessage = "";
+        
+            if (score > 8) {
+                feedbackMessage = "Excellent knowledge of Rwanda's location and culture!";
+            } else if (score > 6) {
+                feedbackMessage = "Very good knowledge about Rwanda!";
+            } else if (score > 4) {
+                feedbackMessage = "Good knowledge about Rwanda! Keep learning and exploring more.";
+            } else {
+                feedbackMessage = "You scored below average. Keep exploring and learning about Rwanda.";
+            }
+        
+            // Add feedback message to certificate
+            const feedbackElement = document.createElement("p");
+            feedbackElement.textContent = feedbackMessage;
+            document.getElementById("certificate").appendChild(feedbackElement);
+        
+            // Show the download button after certificate is displayed
+            document.getElementById("downloadBtn").style.display = "block";
+        }
+        
+
+        function downloadCertificate() {
+            const certificate = document.getElementById("certificate");
+            const canvas = document.createElement("canvas");
+            canvas.width = certificate.offsetWidth;
+            canvas.height = certificate.offsetHeight;
+
+            const context = canvas.getContext("2d");
+            context.scale(2, 2);
+            html2canvas(certificate).then((canvas) => {
+                const link = document.createElement("a");
+                link.download = "certificate.png";
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+
+        document.getElementById("startScreen").style.display = "block";
+        function showCertificate() {
+            document.getElementById("endScreen").style.display = "none";
+            document.getElementById("certificate").style.display = "block";
+            document.getElementById("certificateName").textContent = playerName;
+            document.getElementById("certificateScore").textContent = `${score} out of ${questions.length}`;
+        
+            // Add Partners' Logos dynamically
+           // const partners = [
+            //    { name: "", logoSrc: "ST.png" },
+             //   { name: "", logoSrc: "im.png" },
+              //  { name: "", logoSrc: "RC.png" }
+            //];
+        
+            const partnersContainer = document.getElementById("partners");
+            partnersContainer.innerHTML = ""; // Clear any existing content
+        
+           // partners.forEach(partner => {
+                //const partnerDiv = document.createElement("div");
+                //partnerDiv.classList.add("partner");
+               // partnerDiv.style.textAlign = "center";
+        
+                //const partnerName = document.createElement("p");
+                //partnerName.textContent = partner.name;
+        
+                //const partnerLogo = document.createElement("img");
+                //partnerLogo.src = partner.logoSrc;
+                //partnerLogo.alt = `${partner.name} Logo`;
+                //partnerLogo.style.maxWidth = "100px";
+                //partnerLogo.style.height = "auto";
+        
+                //partnerDiv.appendChild(partnerLogo);
+                //partnerDiv.appendChild(partnerName);
+                //partnersContainer.appendChild(partnerDiv);
+           // });
+        
+            // Add the logo in the top left corner of the certificate
+            //const logo = document.createElement("img");
+            //logo.src = "rw.jpg";  // Your logo path
+            //logo.alt = "Logo";
+            //logo.style.position = "absolute";
+            //logo.style.top = "20px";
+            //logo.style.left = "20px";
+            //logo.style.width = "80px";
+            //logo.style.height = "auto";
+            //logo.style.marginLeft = "10px";
+            //logo.style.marginTop = "5px";
+        
+            //document.getElementById("certificate").appendChild(logo);
+        
+            // Show the download button after certificate is displayed
+            document.getElementById("downloadBtn").style.display = "block";
+        }
+        
+    </script>
+
+    <!-- Add html2canvas library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</body>
+</html>
